@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/magicdvd/nacos-client"
+	"google.golang.org/grpc/balancer/weightedroundrobin"
 	"google.golang.org/grpc/resolver"
 )
 
@@ -156,10 +157,21 @@ func (c *nacosResolver) getInstances(service *nacos.Service) ([]resolver.Address
 	ret := make([]resolver.Address, l)
 	for i := 0; i < l; i++ {
 		ins := service.Instances[i]
-		ret = append(ret, resolver.Address{
+		addr := resolver.Address{
 			Addr:       fmt.Sprintf("%s:%d", ins.Ip, ins.Port),
 			ServerName: c.serviceName,
+		}
+		w := ins.Weight
+		var weight uint32 = 0
+		if w < 0 {
+			weight = 0
+		} else {
+			weight = uint32(w)
+		}
+		addr = weightedroundrobin.SetAddrInfo(addr, weightedroundrobin.AddrInfo{
+			Weight: weight,
 		})
+		ret = append(ret, addr)
 	}
 	return ret, nil
 }
