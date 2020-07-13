@@ -20,10 +20,10 @@ func Target(nacosAddr string, serviceName string, ops ...Option) string
 
 Options对应nacos注册
 
-- OptionGroupName 分组
-- OptionNameSpaceID 命名空间
-- OptionClusters 集群
-- OptionModeHeartBeat 更新源使用心跳方式
+- OptionGroupName 分组 (DEFAULT_GROUP)
+- OptionNameSpaceID 命名空间 (pubic)
+- OptionClusters 集群()
+- OptionModeHeartBeat 更新源使用心跳方式(默认）
 - OptionModeSubscribe 更新源使用订阅模式
 
 ## 测试
