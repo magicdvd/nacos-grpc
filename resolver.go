@@ -180,5 +180,9 @@ func (c *nacosResolver) ResolveNow(o resolver.ResolveNowOptions) {
 }
 
 func (c *nacosResolver) Close() {
-	close(c.close)
+	if c.mode == modeHeartBeat {
+		close(c.close)
+	} else {
+		c.nacosClient.Unsubscribe(c.serviceName)
+	}
 }
