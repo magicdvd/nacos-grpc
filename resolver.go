@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/magicdvd/nacos-client"
-	"google.golang.org/grpc/balancer/weightedroundrobin"
+	"github.com/magicdvd/nacos-grpc/balancer/weightedroundrobin"
 	"google.golang.org/grpc/resolver"
 )
 
@@ -43,15 +43,15 @@ func newNacosResolver(target resolver.Target, cc resolver.ClientConn) (*nacosRes
 	if target.Scheme != "nacos" && target.Scheme != "nacoss" {
 		return nil, ErrUnsupportSchema
 	}
-	u, err := url.Parse("http://test.com" + target.Endpoint)
+	u, err := url.Parse("http://test.com/" + target.Endpoint)
 	if err != nil {
 		return nil, err
 	}
-	schema := "http"
+	schema := "http://"
 	if target.Scheme == "nacoss" {
 		schema = "https://"
 	}
-	client, err := nacos.NewServiceClient(schema + target.Authority + "/" + u.Host + "/" + u.Path)
+	client, err := nacos.NewServiceClient(schema + target.Authority + u.Path)
 	if err != nil {
 		return nil, err
 	}
@@ -138,7 +138,7 @@ func (c *nacosResolver) start() {
 			}
 		}
 	} else {
-		c.nacosClient.Subscribe(c.serviceName, func(service *nacos.Service) {
+		err := c.nacosClient.Subscribe(c.serviceName, func(service *nacos.Service) {
 			addrs, err := c.getInstances(service)
 			if err != nil {
 				c.cc.ReportError(err)
@@ -146,6 +146,9 @@ func (c *nacosResolver) start() {
 				c.cc.UpdateState(resolver.State{Addresses: addrs})
 			}
 		}, c.params...)
+		if err != nil {
+			c.cc.ReportError(err)
+		}
 	}
 }
 
@@ -162,15 +165,11 @@ func (c *nacosResolver) getInstances(service *nacos.Service) ([]resolver.Address
 			ServerName: c.serviceName,
 		}
 		w := ins.Weight
-		var weight uint32 = 0
-		if w < 0 {
-			weight = 0
-		} else {
+		var weight uint32
+		if w > 0 {
 			weight = uint32(w)
 		}
-		addr = weightedroundrobin.SetAddrInfo(addr, weightedroundrobin.AddrInfo{
-			Weight: weight,
-		})
+		addr = weightedroundrobin.SetWeight(addr, weight)
 		ret = append(ret, addr)
 	}
 	return ret, nil

@@ -9,5 +9,5 @@ func Test_newNacosResolver(t *testing.T) {
 	// if err != nil {
 	// 	t.Error(err)
 	// }
-	t.Log(Target("http://nacos:nacos@127.0.0.1:8080/nacos", "serviceName"))
+	t.Log(Target("http://nacos:nacos@127.0.0.1:8848/nacos", "hello"))
 }

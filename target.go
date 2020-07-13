@@ -76,6 +76,8 @@ func Target(nacosAddr string, serviceName string, ops ...Option) string {
 		groupName:   constant.DefaultGroupName,
 		clusters:    "",
 		nameSpaceID: constant.DefaultNameSpaceID,
+		mode:        modeHeartBeat,
+		hbInterval:  10 * time.Second,
 	}
 	for _, v := range ops {
 		v.apply(opts)
