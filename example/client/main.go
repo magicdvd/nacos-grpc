@@ -6,7 +6,7 @@ import (
 
 	nacosgrpc "github.com/magicdvd/nacos-grpc"
 	"github.com/magicdvd/nacos-grpc/balancer/weightedroundrobin"
-	"github.com/magicdvd/nacos-grpc/pb"
+	"github.com/magicdvd/nacos-grpc/example/pb"
 	"google.golang.org/grpc"
 )
 

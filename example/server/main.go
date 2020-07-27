@@ -7,7 +7,7 @@ import (
 	"net"
 
 	"github.com/magicdvd/nacos-client"
-	"github.com/magicdvd/nacos-grpc/pb"
+	"github.com/magicdvd/nacos-grpc/example/pb"
 	"google.golang.org/grpc"
 )
 
